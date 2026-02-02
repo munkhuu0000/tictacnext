@@ -1,20 +1,12 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const [board, setBoard] = useState(["", "", "", "", "", "", "", "", ""]);
   const [turn, setTurn] = useState("X");
   const [winner, setWinner] = useState(null);
-
-  const handleclick = (index) => () => {
-    const newBoard = [...board];
-    if (newBoard[index] !== "") return;
-    newBoard[index] = turn;
-    setBoard(newBoard);
-    setTurn(turn === "X" ? "O" : "X");
-    checkWinner();
-  };
 
   useEffect(() => {
     const checkWinner = () => {
@@ -64,28 +56,54 @@ export default function Home() {
         setWinner(board[2]);
       }
     };
+    if (!board.includes("") && !winner) {
+      setWinner("Draw");
+    }
+
     checkWinner();
   }, [board]);
 
+  const handleclick = (index) => () => {
+    const newBoard = [...board];
+    if (newBoard[index] !== "") return;
+    newBoard[index] = turn;
+    setBoard(newBoard);
+    setTurn(turn === "X" ? "O" : "X");
+  };
+
+  const restartGame = () => {
+    setBoard(Array(9).fill(""));
+    setTurn("X");
+    setWinner(null);
+  };
+
   if (winner) {
     return (
-      <div className="text-[24px] flex justify-center text-black">
-        {winner} hojlee
+      <div className="w-full min-h-screen flex justify-center flex-col bg-neutral-700">
+        <div className="text-[24px] flex flex-col gap-2 justify-center text-white w-full items-center">
+          {winner === "Draw" ? "Draw" : `${winner} won`}
+          <Button
+            variant="outline"
+            className="text-black"
+            onClick={restartGame}
+          >
+            Restart
+          </Button>
+        </div>
       </div>
     );
   }
-
   return (
-    <div className="flex justify-center flex-col">
-      <p className="text-[64px] font-bold text-black p-5 flex justify-center">
+    <div className="w-full min-h-screen flex justify-center flex-col bg-neutral-700">
+      <p className="text-[64px] font-bold text-white p-5 flex justify-center">
         Tic Tac Toe
       </p>
-      <div className="w-[680px] h-[680px] grid grid-cols-3 grid-rows-3 gap-5 border-4 border-black self-center p-5 text-black">
+      <div className="w-[680px] h-[680px] grid grid-cols-3 grid-rows-3 gap-5 border-4 border-white self-center p-5 text-white">
         {board.map((item, index) => {
           return (
             <div
               key={index}
-              className="w-[200px] h-[200px] border-2 border-black text-[72px] flex justify-center items-center"
+              className="w-[200px] h-[200px] border-2 border-white text-[72px] flex justify-center items-center"
               onClick={handleclick(index)}
             >
               {item}
@@ -96,10 +114,3 @@ export default function Home() {
     </div>
   );
 }
-
-// onClick={() => {
-//   setText("playerX");
-//   count++;
-//   console.log(setText);
-//   console.log(count);
-// }}
